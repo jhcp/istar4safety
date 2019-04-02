@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="istar4safety" nsURI="http://www.example.org/istar4safety" nsPrefix="istar4safety">
+  <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+    <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+  </eAnnotations>
+  <eClassifiers xsi:type="ecore:EEnum" name="AccidentLevel">
+    <eLiterals name="L1"/>
+    <eLiterals name="L2"/>
+    <eLiterals name="L3"/>
+    <eLiterals name="L4"/>
+    <eLiterals name="L5"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Actor">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="wants" upperBound="-1"
+        eType="#//IntentionalElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="participatesIn" upperBound="-1"
+        eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="isA" upperBound="-1" eType="#//Actor"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Agent" eSuperTypes="#//Actor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Role" eSuperTypes="#//Actor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Model">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actors" upperBound="-1"
+        eType="#//Actor" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependencies" upperBound="-1"
+        eType="#//Dependency" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IntentionalElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contributesTo" upperBound="-1"
+        eType="#//Quality"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Resource" eSuperTypes="#//IntentionalElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="neededBy" upperBound="-1"
+        eType="#//GoalOrTask"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Quality" eSuperTypes="#//IntentionalElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="CanQualifyOnlyGoalTaskOrResource"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="CanQualifyOnlyGoalTaskOrResource" value="&#xA;&#x9;&#x9;&#x9;self.qualifies->forAll(e | e.oclIsKindOf(Goal) or e.oclIsKindOf(Task) or e.oclIsKindOf(Resource))"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="qualifies" upperBound="-1"
+        eType="#//IntentionalElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GoalOrTask" abstract="true" eSuperTypes="#//IntentionalElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="refinedBy" eType="#//Refinement"
+        containment="true" eOpposite="#//Refinement/from"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Goal" eSuperTypes="#//GoalOrTask"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Task" eSuperTypes="#//GoalOrTask"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SafetyGoal" eSuperTypes="#//Goal">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="accidentLevel" eType="#//AccidentLevel"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Hazard" eSuperTypes="#//Goal">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="AtLeastOneRefinement"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="AtLeastOneRefinement" value="&#xA;&#x9;&#x9;&#x9;self.refinedBy->size() > 0"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="obstructs" upperBound="-1"
+        eType="#//SafetyGoal"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SafetyTask" eSuperTypes="#//Task"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SafetyResource" eSuperTypes="#//Resource">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="NeededByOnlyByHazardOrTask"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="NeededByOnlyByHazardOrTask" value="&#xA;&#x9;&#x9;&#x9;self.neededBy->forAll(e | e.oclIsKindOf(Hazard) or e.oclIsKindOf(Task))"/>
+    </eAnnotations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Dependency">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="DependumCannotBeSafetyElement"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="DependumCannotBeSafetyElement" value="&#xA;&#x9;&#x9;&#x9;not (self.dependum.oclIsKindOf(Hazard) or self.dependum.oclIsKindOf(SafetyGoal) or self.dependum.oclIsKindOf(SafetyTask) or self.dependum.oclIsKindOf(SafetyResource))"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="depender" eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependee" eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependeeElmt" eType="#//IntentionalElement"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependerElmt" eType="#//IntentionalElement"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependum" lowerBound="1"
+        eType="#//IntentionalElement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Refinement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="from" eType="#//GoalOrTask"
+        eOpposite="#//GoalOrTask/refinedBy"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AndRefinement" eSuperTypes="#//Refinement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="SafetyGoalCanOnlyBeRefinedAsSafetyGoalXorHazard NonRootHazardsCannotRefineSafetyGoal HazardRefinementKindsConstraint"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="SafetyGoalCanOnlyBeRefinedAsSafetyGoalXorHazard" value="&#xA;&#x9;&#x9;&#x9;self.from.oclIsKindOf(SafetyGoal)&#xA;&#x9;&#x9;&#x9;&#x9;implies &#xA;&#x9;&#x9;&#x9;&#x9;&#x9;self.to->forAll(e | e.oclIsTypeOf(SafetyGoal)) or self.to->forAll(e | e.oclIsTypeOf(Hazard))"/>
+      <details key="NonRootHazardsCannotRefineSafetyGoal" value="&#xA;&#x9;&#x9;&#x9;self.from.oclIsKindOf(SafetyGoal)&#xA;&#x9;&#x9;&#x9;implies&#xA;&#x9;&#x9;&#x9;&#x9;self.to->select(e | e.oclIsKindOf(Hazard))->forAll(e | not Refinement.allInstances()->exists(e | self.to->includes(e.from) and e &lt;> self))"/>
+      <details key="HazardRefinementKindsConstraint" value=" &#xA;&#x9;&#x9;&#x9;self.from.oclIsKindOf(Hazard)&#xA;&#x9;&#x9;&#x9;implies&#xA;&#x9;&#x9;&#x9;&#x9;self.to->forAll(e | e.oclIsTypeOf(SafetyTask) or e.oclIsTypeOf(SafetyResource)) or self.to->forAll(e | e.oclIsTypeOf(Hazard))"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="to" lowerBound="2" upperBound="-1"
+        eType="#//GoalOrTask"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OrRefinement" eSuperTypes="#//Refinement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="SafetyGoalCanOnlyBeRefinedAsSafetyGoalXorHazard NonRootHazardsCannotRefineSafetyGoal HazardRefinementKindsConstraint"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="SafetyGoalCanOnlyBeRefinedAsSafetyGoalXorHazard" value="&#xA;&#x9;&#x9;&#x9;self.from.oclIsKindOf(SafetyGoal)&#xA;&#x9;&#x9;&#x9;&#x9;implies &#xA;&#x9;&#x9;&#x9;&#x9;&#x9;self.to->forAll(e | e.oclIsTypeOf(SafetyGoal)) or self.to->forAll(e | e.oclIsTypeOf(Hazard))"/>
+      <details key="NonRootHazardsCannotRefineSafetyGoal" value="&#xA;&#x9;&#x9;&#x9;self.from.oclIsKindOf(SafetyGoal)&#xA;&#x9;&#x9;&#x9;implies&#xA;&#x9;&#x9;&#x9;&#x9;self.to->select(e | e.oclIsKindOf(Hazard))->forAll(e | not Refinement.allInstances()->exists(e | self.to->includes(e.from) and e &lt;> self))"/>
+      <details key="HazardRefinementKindsConstraint" value="&#xA;&#x9;&#x9;&#x9;self.from.oclIsKindOf(Hazard)&#xA;&#x9;&#x9;&#x9;implies&#xA;&#x9;&#x9;&#x9;&#x9;self.to->forAll(e | e.oclIsTypeOf(SafetyTask) or e.oclIsTypeOf(SafetyResource)) or self.to->forAll(e | e.oclIsTypeOf(Hazard))"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="to" lowerBound="1" upperBound="-1"
+        eType="#//GoalOrTask"/>
+  </eClassifiers>
+</ecore:EPackage>
